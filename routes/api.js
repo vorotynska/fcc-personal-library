@@ -7,8 +7,8 @@
  */
 
 'use strict';
+const bodyParser = require('body-parser');
 let mongoose = require('mongoose');
-
 
 module.exports = function (app) {
 
@@ -40,7 +40,6 @@ module.exports = function (app) {
       } catch (error) {
         res.status(500).send(error)
       }
-
     })
 
     .post(async (req, res) => {
@@ -63,7 +62,7 @@ module.exports = function (app) {
       }
     })
 
-  /* .delete(async (req, res) => {
+    .delete(async (req, res) => {
       //if successful response will be 'complete delete successful'
       try {
         await Book.deleteMany({});
@@ -74,8 +73,6 @@ module.exports = function (app) {
       }
 
     });
-*/
-
 
   app.route('/api/books/:id')
     .get(async (req, res) => {
@@ -97,19 +94,15 @@ module.exports = function (app) {
       const bookid = req.params.id;
       const comment = req.body.comment;
       //json res format same as .get
-      if (!req.body.comment) {
-        return res.status(400).send('missing required field comment');
+      if (!comment) {
+        return res.send('missing required field comment');
       }
 
       try {
         const book = await Book.findById(bookid).exec();
-        /*
-         if (!findBook) {
-         return res.status(404).send('no book exists');
-         }
-        */
+
         if (!book) {
-          return res.status(404).send('no book exists');
+          return res.status.send('no book exists');
         }
 
         book.comments.push(comment); // Добавляем комментарий в массив комментариев книги
@@ -117,7 +110,7 @@ module.exports = function (app) {
 
         res.json(book); // Возвращаем обновленный объект книги
       } catch (error) {
-        res.status(500).send('error')
+        res.send('error')
       }
     })
 
@@ -126,12 +119,12 @@ module.exports = function (app) {
       // Попытка найти и удалить книгу по заданному _id
       try {
         const deletedBook = await Book.findByIdAndDelete(bookId);
-        if (!deletedBook) {
-          return res.status(404).send('no book exists');
+        if (!bookId) {
+          return res.send('no book exists');
         }
         res.send('delete successful');
       } catch (error) {
-        res.status(500).send('internal server error');
+        res.send(' error');
       }
     });
 
