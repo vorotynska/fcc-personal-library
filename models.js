@@ -1,12 +1,23 @@
 const mongoose = require("mongoose")
 
 const {
-    Schema, 
-} = mongoose
+  Schema,
+} = mongoose.Schema
 
-const bookSchema = new mongoose.Schema({
-	title: {type: String, required: true},
+const BookSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true
+  },
   comments: [String]
 })
 
-let Book = mongoose.model('Book', bookSchema)
+// Sets the createdAt parameter equal to the current time
+BookSchema.pre('save', function (next) {
+  const now = new Date();
+  if (!this.createdAt) {
+    this.createdAt = now;
+  }
+  next();
+});
+module.exports = mongoose.model('Book', BookSchema)

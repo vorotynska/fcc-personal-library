@@ -8,11 +8,12 @@
 
 'use strict';
 const bodyParser = require('body-parser');
-let mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const Book = require('../models');
 
 module.exports = function (app) {
 
-  const BookSchema = new mongoose.Schema({
+  /*const BookSchema = new mongoose.Schema({
     title: {
       type: String,
       required: true
@@ -20,7 +21,7 @@ module.exports = function (app) {
     comments: [String]
   })
 
-  const Book = mongoose.model('Book', BookSchema)
+  const Book = mongoose.model('Book', BookSchema)*/
 
   app.route('/api/books')
     .get(async (req, res) => {
@@ -45,11 +46,8 @@ module.exports = function (app) {
     .post(async (req, res) => {
       const title = req.body.title;
       //response will contain new book object including atleast _id and title
-
       if (!title) {
-        return res.status(400).json({
-          error: 'missing title'
-        }); // Вернуть JSON с сообщением об ошибке
+        return res.json('missing title'); // Вернуть JSON с сообщением об ошибке
       }
       //response will contain new book object including atleast _id and title
       let book = new Book(req.body)
@@ -71,7 +69,6 @@ module.exports = function (app) {
         console.error(error);
         res.status(500).send('error');
       }
-
     });
 
   app.route('/api/books/:id')
@@ -79,14 +76,13 @@ module.exports = function (app) {
       let bookid = req.params.id;
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
       try {
-        const findBook = await Book.findById(bookid).exec();
-        if (!findBook) {
-          return res.status(404).send('no book exists');
+        const book = await Book.findById(bookid).exec();
+        if (!bookid) {
+          return res.json('no book exists');
         }
-        res.json(findBook);
+        res.json(book);
       } catch (error) {
         console.error(error);
-        res.status(500).send('error');
       }
     })
 
@@ -100,14 +96,12 @@ module.exports = function (app) {
 
       try {
         const book = await Book.findById(bookid).exec();
-
         if (!book) {
-          return res.status.send('no book exists');
+          return res.send('no book exists');
         }
 
         book.comments.push(comment); // Добавляем комментарий в массив комментариев книги
         await book.save(); // Сохраняем обновленную книгу
-
         res.json(book); // Возвращаем обновленный объект книги
       } catch (error) {
         res.send('error')
@@ -115,11 +109,10 @@ module.exports = function (app) {
     })
 
     .delete(async (req, res) => {
-      const bookId = req.params.id;
-      // Попытка найти и удалить книгу по заданному _id
+      const bookid = req.params.id;
       try {
-        const deletedBook = await Book.findByIdAndDelete(bookId);
-        if (!bookId) {
+        const deletedBook = await Book.findByIdAndDelete(bookid);
+        if (!deletedBook) {
           return res.send('no book exists');
         }
         res.send('delete successful');
