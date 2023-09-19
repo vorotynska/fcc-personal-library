@@ -47,9 +47,9 @@ module.exports = function (app) {
       const title = req.body.title;
       //response will contain new book object including atleast _id and title
       if (!title) {
-        return res.json('missing title'); // Вернуть JSON с сообщением об ошибке
+        return res.json('missing required field title'); // Вернуть JSON с сообщением об ошибке
       }
-      //response will contain new book object including atleast _id and title
+
       let book = new Book(req.body)
 
       try {
@@ -77,7 +77,7 @@ module.exports = function (app) {
       //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
       try {
         const book = await Book.findById(bookid).exec();
-        if (!bookid) {
+        if (!book) {
           return res.json('no book exists');
         }
         res.json(book);

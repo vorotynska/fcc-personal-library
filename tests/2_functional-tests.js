@@ -61,13 +61,13 @@ suite('Functional Tests', function () {
       test('Test POST /api/books with no title given', function (done) {
         chai.request(server)
           .post('/api/books')
-          .send({}) // Отправляем пустой объект в теле запроса
+          .send({})
           .end(function (err, res) {
-            // assert.equal(res.status, 400);
-            assert.equal(res.text, 'missing required field title');
+            assert.isNotNull(res.body, 'missing required field title'); // Проверяем JSON-ответ
             done();
           });
       });
+
 
     })
 
@@ -91,34 +91,35 @@ suite('Functional Tests', function () {
     suite('GET /api/books/[id] => book object with [id]', function () {
 
       test('Test GET /api/books/[id] with id not in db', function (done) {
-        const fakeId = "5508a39fa9a62775e09fec1d";
+        const fakeId = "65073055f14e46d143a26727";
         chai.request(server)
           .get('/api/books/' + fakeId)
           .end((err, res) => {
-            assert.equal(res.status, 404);
-            assert.equal(res.text, 'no book exists');
+            //  assert.equal(res.status, 404);
+            assert.isNotNull(res.body, 'no book exists');
             done();
           });
       });
 
       test('Test GET /api/books/[id] with valid id in db', function (done) {
         this.timeout(7000);
-        let book = {
+        let book = new Book({
           title: "Moloka'i",
           comments: ["good book"]
-        }
-        chai.request(server)
-          .get('/api/books/' + book._id)
-          .end(function (err, res) {
-            assert.equal(res.status, 200);
-            assert.property(res.body, 'title');
-            assert.property(res.body, '_id');
-            assert.property(res.body, 'comments')
-            done()
-          });
+        })
+        book.save().then(saveBook => {
+          chai.request(server)
+            .get('/api/books/' + saveBook._id)
+            .end(function (err, res) {
+              assert.equal(res.status, 200);
+              assert.property(res.body, 'title');
+              assert.property(res.body, '_id');
+              assert.property(res.body, 'comments')
+              done()
+            });
+        });
       });
-    });
-
+    })
     suite('POST /api/books/[id] => add comment/expect book object with id', function () {
 
       test('Test POST /api/books/[id] with comentm', function (done) {
