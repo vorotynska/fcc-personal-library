@@ -48,6 +48,7 @@ suite('Functional Tests', function () {
           title: "The Lord of the Rings"
         }
         chai.request(server)
+          .keepOpen()
           .post('/api/books')
           .send(book)
           .end(function (err, res) {
@@ -60,6 +61,7 @@ suite('Functional Tests', function () {
 
       test('Test POST /api/books with no title given', function (done) {
         chai.request(server)
+          .keepOpen()
           .post('/api/books')
           .send({})
           .end(function (err, res) {
@@ -76,6 +78,7 @@ suite('Functional Tests', function () {
       test('Test GET /api/books', function (done) {
         this.timeout(8000);
         chai.request(server)
+          .keepOpen()
           .get('/api/books')
           .end(function (err, res) {
             assert.equal(res.status, 200);
@@ -93,6 +96,7 @@ suite('Functional Tests', function () {
       test('Test GET /api/books/[id] with id not in db', function (done) {
         const fakeId = "65073055f14e46d143a26727";
         chai.request(server)
+          .keepOpen()
           .get('/api/books/' + fakeId)
           .end((err, res) => {
             //  assert.equal(res.status, 404);
@@ -109,6 +113,7 @@ suite('Functional Tests', function () {
         })
         book.save().then(saveBook => {
           chai.request(server)
+            .keepOpen()
             .get('/api/books/' + saveBook._id)
             .end(function (err, res) {
               assert.equal(res.status, 200);
@@ -133,6 +138,7 @@ suite('Functional Tests', function () {
         book.save().then(savedBook => {
           const comment = 'good book';
           chai.request(server)
+            .keepOpen()
             .post('/api/books/' + savedBook._id)
             .send({
               comment
@@ -157,6 +163,7 @@ suite('Functional Tests', function () {
         // Сохраните книгу в базе данных и получите ее _id
         book.save().then(savedBook => {
           chai.request(server)
+            .keepOpen()
             .post('/api/books/' + savedBook._id)
             .send({})
             .end(function (err, res) {
@@ -172,6 +179,7 @@ suite('Functional Tests', function () {
         const fakeId = "65073055f14e46d143a26727"; // Недействительный _id
         const comment = 'Test comment'; // Ваш комментарий
         chai.request(server)
+          .keepOpen()
           .post('/api/books/' + fakeId)
           .send({
             comment
@@ -194,6 +202,7 @@ suite('Functional Tests', function () {
         })
         book.save().then(savedBook => {
           chai.request(server)
+            .keepOpen()
             .delete('/api/books/' + savedBook._id)
             .end(function (err, res) {
               // assert.equal(res.status, 200);
@@ -207,6 +216,7 @@ suite('Functional Tests', function () {
         this.timeout(5000);
         const fakeId = 'fakeId'; // Замените на несуществующий _id
         chai.request(server)
+          .keepOpen()
           .delete('/api/books/' + fakeId)
           .end(function (err, res) {
             // assert.equal(res.status, 404);
